@@ -4,8 +4,8 @@
 
 //config data
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //arduino MAC
-IPAddress ip(192, 168, 50, 200); //arduino ip
-char serverAddress[] = "192.168.50.100";  // server address
+IPAddress ip(); //arduino ip
+char serverAddress[] = "";  // server address
 int port = 1880; //node-red port
 
 //timers
