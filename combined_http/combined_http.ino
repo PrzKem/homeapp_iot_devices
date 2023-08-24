@@ -6,15 +6,18 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; //arduino MAC
 IPAddress ip(); //arduino ip
 char serverAddress[] = "";  // server address
-int port = 1880; //node-red port
+int port = ; //node-red port
 
 //timers
-unsigned long lastPutRequestTime, lastGetRequestTime, actualTime;
-long putRequestDelay = 9000;
-long getRequestDelay = 4000;
+unsigned long lastPostRequestTime, lastGetRequestTime, actualTime;
+long postRequestDelay = 4000;
+long getRequestDelay = 3000;
 
 //semaphore to block request until response is obtained
 bool semaphore_requestBlock = false;
+
+//other data
+int actualWorkMode = 2; //1-auto, 2-manu
 
 EthernetClient eth;
 HttpClient client = HttpClient(eth, serverAddress, port);
@@ -24,7 +27,7 @@ void setup() {
   randomSeed(analogRead(0));
   setupEthernetShield();
   actualTime = millis();
-  lastPutRequestTime = actualTime;
+  lastPostRequestTime = actualTime;
   lastGetRequestTime = actualTime;
   get_request("/api/iot/token", 1);
 }
@@ -32,10 +35,12 @@ void setup() {
 void loop() 
 {
   actualTime = millis();
-  if(actualTime>=lastPutRequestTime+putRequestDelay)
+  if(actualTime>=lastPostRequestTime+postRequestDelay)
   {
-    post_request("/api/readings", 1, random(0, 300)/10.0);
-    lastPutRequestTime = actualTime;
+    post_sensor_reading("/api/readings", 1, random(0, 300)/10.0);
+    post_sensor_reading("/api/readings", 2, random(0, 300)/10.0);
+    post_keep_alive(2,"Arduino led controller", "sypialnia");
+    lastPostRequestTime = actualTime;
   }
   if(actualTime>=lastGetRequestTime+getRequestDelay)
   {
